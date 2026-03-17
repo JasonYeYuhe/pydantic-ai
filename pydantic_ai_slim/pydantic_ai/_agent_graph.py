@@ -735,7 +735,7 @@ class ModelRequestNode(AgentNode[DepsT, NodeRunEndT]):
         response = await ctx.deps.root_capability.after_model_request(
             run_context,
             messages=messages or ctx.state.message_history[:],
-            model_settings=model_settings or ctx.deps.model_settings or ModelSettings(),
+            model_settings=model_settings or ctx.state.model_settings or ModelSettings(),
             model_request_parameters=model_request_parameters or await _prepare_request_parameters(ctx),
             response=response,
         )
