@@ -179,7 +179,7 @@ class ExecutionEnvironmentToolset(FunctionToolset[Any]):
                     lines.append(entry.name)
             return '\n'.join(lines)
 
-        self.tool(ls)
+        self.tool_plain(ls)
 
     def _register_shell(self) -> None:
         async def shell(command: str, timeout: int = 120) -> str:
@@ -200,7 +200,7 @@ class ExecutionEnvironmentToolset(FunctionToolset[Any]):
             parts.append(f'Exit code: {result.exit_code}')
             return '\n'.join(parts)
 
-        self.tool(requires_approval=self._require_shell_approval)(shell)
+        self.tool_plain(requires_approval=self._require_shell_approval)(shell)
 
     def _register_read_file(self) -> None:
         async def read_file(path: str, offset: int = 0, limit: int = 2000) -> Any:
@@ -235,7 +235,7 @@ class ExecutionEnvironmentToolset(FunctionToolset[Any]):
             except (FileNotFoundError, PermissionError, ValueError, OSError) as e:
                 return f'Error: {e}'
 
-        self.tool(read_file)
+        self.tool_plain(read_file)
 
     def _register_write_file(self) -> None:
         async def write_file(path: str, content: str) -> str:
@@ -253,7 +253,7 @@ class ExecutionEnvironmentToolset(FunctionToolset[Any]):
             except (PermissionError, OSError) as e:
                 return f'Error: {e}'
 
-        self.tool(requires_approval=self._require_write_approval)(write_file)
+        self.tool_plain(requires_approval=self._require_write_approval)(write_file)
 
     def _register_edit_file(self) -> None:
         async def edit_file(path: str, old: str, new: str, replace_all: bool = False) -> str:
@@ -275,7 +275,7 @@ class ExecutionEnvironmentToolset(FunctionToolset[Any]):
             except (FileNotFoundError, PermissionError, ValueError, OSError) as e:
                 raise ModelRetry(str(e))
 
-        self.tool(requires_approval=self._require_write_approval)(edit_file)
+        self.tool_plain(requires_approval=self._require_write_approval)(edit_file)
 
     def _register_glob(self) -> None:
         async def glob_tool(pattern: str, path: str = '.') -> str:
@@ -301,7 +301,7 @@ class ExecutionEnvironmentToolset(FunctionToolset[Any]):
                 result += '\n[... truncated, showing first 100 matches]'
             return result
 
-        self.tool(name='glob')(glob_tool)
+        self.tool_plain(name='glob')(glob_tool)
 
     def _register_grep(self) -> None:
         async def grep_tool(
@@ -331,7 +331,7 @@ class ExecutionEnvironmentToolset(FunctionToolset[Any]):
                 return 'No matches found.'
             return result
 
-        self.tool(name='grep')(grep_tool)
+        self.tool_plain(name='grep')(grep_tool)
 
     async def get_tools(self, ctx: RunContext[AgentDepsT]) -> dict[str, ToolsetTool[AgentDepsT]]:
         all_tools = await super().get_tools(ctx)

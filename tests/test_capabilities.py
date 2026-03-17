@@ -683,7 +683,7 @@ class ToolsetFuncCapability(AbstractCapability[None]):
         def make_toolset(ctx: RunContext[None]) -> AbstractToolset[None]:
             toolset = FunctionToolset[None]()
 
-            @toolset.tool
+            @toolset.tool_plain
             def greet(name: str) -> str:
                 """Greet someone by name."""
                 return f'Hello, {name}!'
