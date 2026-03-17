@@ -12,6 +12,9 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 from pydantic import TypeAdapter
 from typing_extensions import assert_never
 
+from pydantic_ai._utils import is_str_dict as _is_str_dict
+
+from ... import _instructions
 from ...messages import (
     AudioUrl,
     BinaryContent,
@@ -74,7 +77,7 @@ if TYPE_CHECKING:
     from starlette.responses import Response
 
     from ...agent import AbstractAgent
-    from ...agent.abstract import AgentMetadata, Instructions
+    from ...agent.abstract import AgentMetadata
     from ...builtin_tools import AbstractBuiltinTool
     from ...models import KnownModelName, Model
     from ...output import OutputSpec
@@ -159,7 +162,7 @@ class VercelAIAdapter(UIAdapter[RequestData, UIMessage, BaseChunk, AgentDepsT, O
         message_history: Sequence[ModelMessage] | None = None,
         deferred_tool_results: DeferredToolResults | None = None,
         model: Model | KnownModelName | str | None = None,
-        instructions: Instructions[DispatchDepsT] = None,
+        instructions: _instructions.Instructions[DispatchDepsT] = None,
         deps: DispatchDepsT = None,
         output_type: OutputSpec[Any] | None = None,
         model_settings: ModelSettings | None = None,
@@ -326,8 +329,8 @@ class VercelAIAdapter(UIAdapter[RequestData, UIMessage, BaseChunk, AgentDepsT, O
                         if isinstance(args, str):
                             try:
                                 parsed = json.loads(args)
-                                if isinstance(parsed, dict):
-                                    args = cast(dict[str, Any], parsed)
+                                if _is_str_dict(parsed):
+                                    args = parsed
                             except json.JSONDecodeError:
                                 pass
                         elif isinstance(args, dict) or args is None:
